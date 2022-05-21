@@ -2,26 +2,28 @@ import logo from './logo.svg';
 import './App.css';
 
 import web3 from './web3';
-function App() {
+import lottery from './lottery';
+import { useState } from 'react';
+function  App () {
+
+  
+  const [manager,setManager]=useState('aaa')
+
   // window.ethereum.enable()
-  web3.eth.getAccounts().then(console.log)
+  const componentDidMount=async()=>{
+    //On va essayer de fetcher qlq données from our contract 
+    const manager=await lottery.methods.manager().call()
+    setManager(manager)
+
+  }
+  
+  componentDidMount()
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <diV>
+      <h2> Lottery Contract</h2>
+      <p> this is contract is managed by  {manager}</p>
+    </diV>
   );
   
 } 
