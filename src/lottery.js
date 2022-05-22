@@ -1,7 +1,6 @@
 //On va essayer de faire une copie local de notre contract déployé sur rinkeby test network
 import web3 from "./web3";
-
-const address = "0xaAa2A1C8Aa80a1EDdA4d6523A35b4756d4DCf919";
+const address = "0x8B38caAFD56189931Ac69DbBC3Adc3492d50bcA8";
 
 const abi = [
   {
@@ -66,4 +65,4 @@ const abi = [
   },
 ];
 
-export default new web3.eth.Contract(abi,address)
+export default new web3.eth.Contract(abi, address);
