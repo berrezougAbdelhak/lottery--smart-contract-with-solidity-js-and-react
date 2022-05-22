@@ -1,6 +1,6 @@
 //On va essayer de faire une copie local de notre contract déployé sur rinkeby test network
 import web3 from "./web3";
-const address = "0x8B38caAFD56189931Ac69DbBC3Adc3492d50bcA8";
+const address = "0xF161d1F3A303d763e7d6c564c503E9E8e6512c6D";
 
 const abi = [
   {

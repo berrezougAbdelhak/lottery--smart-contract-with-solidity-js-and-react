@@ -9,12 +9,26 @@ function  App () {
   const [manager,setManager]=useState('Manager')
   const [players,setPlayers]=useState([])
   //balance est un objet et il est wrapped to bignumber library of JS 
-  const [balance,setBalance]=useState("Balance")
+  const [balance,setBalance]=useState("")
 
   const [value,setValue]=useState('Value')
-  const ChangeValue=(event)=>{
+  const [message,setMessage]=useState("")
+  const OnChangeValue=(event)=>{
     setValue(event.target.value)
     console.log(value)
+  }
+  const onSubmit=async(event)=>{
+    event.preventDefault()
+    const accounts =await web3.eth.getAccounts();
+    setMessage("Waiting on transaction success...")
+    await lottery.methods.enter().send({
+      from:accounts[0],
+      value:web3.utils.toWei(value,"ether")
+    })
+    setMessage("You have been entered")
+  }
+  const onClickPickWinner=async()=>{
+
   }
   // window.ethereum.enable()
   const getManager=async()=>{
@@ -28,10 +42,13 @@ function  App () {
     // console.log(manager)
   }
   const getPlayers=async()=>{
-    const players=await lottery.methods.getPlayers().call()
+    const accounts=await web3.eth.getAccounts()
+    const players=await lottery.methods.getPlayers().call({
+      from:accounts[0]
+    })
     setPlayers(players)
-    console.log("les players sont :")
-    console.log(players)
+    // console.log("les players sont :")
+    // console.log(players)
   }
   const getBalance=async()=>{
     const balance=await web3.eth.getBalance(lottery.options.address)
@@ -41,31 +58,36 @@ function  App () {
 
   }
 getManager()
-// getPlayers()
 getBalance()  
+getPlayers()
 
 
   return (
     <div>
       <h2> Lottery Contract</h2>
       <p> this contract is managed by  {manager} <br/>
-        There are currently {players.length} people entered , <br/> 
-        competting to win {balance} ether !
+        There are currently {players[0]} people entered , <br/> 
+        competting to win { web3.utils.fromWei(balance,"ether")   } ether
       </p>
       <hr/>
-      <form>
+      <form onSubmit={onSubmit}>
         <h4> Want to try your luck </h4>
         <div>
           <label> Amount of ether to enter </label>
           <input 
           value={value}
-          onChange={ChangeValue}/>
+          onChange={OnChangeValue}/>
           
         </div>
         <button>
           Enter
         </button>
       </form>
+      <hr/>
+      <h4> Ready to pick a winner </h4>
+      <button onClick={onClickPickWinner}>Pick a winner  </button>
+      <hr/>
+      <h1>{message}</h1>
     </div>
   );
   
