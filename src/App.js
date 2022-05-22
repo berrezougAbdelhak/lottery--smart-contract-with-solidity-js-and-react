@@ -28,7 +28,12 @@ function  App () {
     setMessage("You have been entered")
   }
   const onClickPickWinner=async()=>{
-
+    const account=await web3.eth.getAccounts()
+    setMessage("waiting on transaction sucess...")
+    await lottery.methods.pickWinner().send({
+      from:account[0]
+    })
+  setMessage("A winner has been picked ")
   }
   // window.ethereum.enable()
   const getManager=async()=>{
@@ -66,7 +71,7 @@ getPlayers()
     <div>
       <h2> Lottery Contract</h2>
       <p> this contract is managed by  {manager} <br/>
-        There are currently {players[0]} people entered , <br/> 
+        There are currently {players.length} people entered , <br/> 
         competting to win { web3.utils.fromWei(balance,"ether")   } ether
       </p>
       <hr/>
