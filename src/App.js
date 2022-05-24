@@ -66,7 +66,21 @@ getManager()
 getBalance()  
 getPlayers()
 
-
+const [buffer,setBuffer]=useState("")
+const OnChooseFile=(event)=>{
+  event.stopPropagation()
+        event.preventDefault()
+        const file = event.target.files[0]
+        let reader = new window.FileReader()
+        reader.readAsArrayBuffer(file)
+        reader.onloadend=()=>convertToBuffer(reader)
+}
+const convertToBuffer = async(reader) => {
+  //file is converted to a buffer for upload to IPFS
+    const buffer = await Buffer.from(reader.result);
+  //set this buffer -using es6 syntax
+    setBuffer(buffer)
+};
   return (
     <div>
       <h2> Lottery Contract</h2>
@@ -93,6 +107,18 @@ getPlayers()
       <button onClick={onClickPickWinner}>Pick a winner  </button>
       <hr/>
       <h1>{message}</h1>
+      <hr/>
+      <h3> Choose file to send to IPFS </h3>
+          <form onSubmit={1}>
+            <input 
+              type = "file"
+              onChange = {OnChooseFile}
+            />
+             <button 
+             type="submit"> 
+             Send it 
+             </button>
+          </form>
     </div>
   );
   
