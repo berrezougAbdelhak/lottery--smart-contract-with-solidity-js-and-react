@@ -1,11 +1,15 @@
 import './App.css';
-
+// import ipfs from './ipfs';
 import web3 from './web3';
 import lottery from './lottery';
 import { useState } from 'react';
+import { create } from 'ipfs-http-client'
+const client = create('https://ipfs.infura.io:5001/api/v0')
+
 function  App () {
 
-  
+  const [fileUrl, updateFileUrl] = useState(``)
+
   const [manager,setManager]=useState('Manager')
   const [players,setPlayers]=useState([])
   //balance est un objet et il est wrapped to bignumber library of JS 
@@ -81,6 +85,48 @@ const convertToBuffer = async(reader) => {
   //set this buffer -using es6 syntax
     setBuffer(buffer)
 };
+const [ethAddress,setEthAddress]=useState('')
+const [ipfsHash,setIpfsHash]=useState('IPFS-HASH')
+const [transactionHash,setTransactionHash]=useState("")
+const onSendIt=async(event)=>{
+  event.preventDefault();
+  //bring in user's metamask account address
+  const accounts = await web3.eth.getAccounts();
+  console.log('Sending from Metamask account: ' + accounts[0]);
+  //obtain contract address from lottery.js
+  const ethAddress= await lottery.options.address;
+  console.log("lottery address "+ethAddress)
+  setEthAddress(ethAddress)
+  try {
+    const added = await client.add(buffer,(err,ipfshash)=>{
+      console.log(err,ipfshash)
+    })
+    setIpfsHash(added.cid.toString())
+    const url = `https://ipfs.infura.io/ipfs/${added.path}`
+    updateFileUrl(url)
+    
+    console.log(url)
+    lottery.methods.sendHash(added.cid.toString()).send({
+      from:accounts[0]},
+      (error, transactionHash) => {
+        console.log(transactionHash);
+        setTransactionHash(transactionHash)
+    })
+  } catch (error) {
+    console.log('Error uploading file: ', error)
+  }
+  
+  //save document to IPFS,return its hash#, and set hash# to state
+    //https://github.com/ipfs/interface-ipfs-core/blob/master/SPEC/FILES.md#add 
+
+    // await ipfs.add(buffer,(err,ipfshash)=>{
+    //   console.log(err,ipfshash)
+    //   //setState by setting ipfsHash to ipfsHash[0].hash 
+    //   setIpfsHash(ipfshash[0].hash)
+    //   console.log(ipfsHash)
+    // })
+
+}
   return (
     <div>
       <h2> Lottery Contract</h2>
@@ -109,7 +155,7 @@ const convertToBuffer = async(reader) => {
       <h1>{message}</h1>
       <hr/>
       <h3> Choose file to send to IPFS </h3>
-          <form onSubmit={1}>
+          <form onSubmit={onSendIt}>
             <input 
               type = "file"
               onChange = {OnChooseFile}
@@ -119,6 +165,12 @@ const convertToBuffer = async(reader) => {
              Send it 
              </button>
           </form>
+          <h1>URl est  {fileUrl}</h1>
+          <hr/>
+
+          <h1> Transaction hash :{transactionHash}</h1>
+          <hr/>
+          <h1> hash of ipfs est {ipfsHash} </h1>
     </div>
   );
   
